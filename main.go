@@ -12,11 +12,20 @@ func leastCommonCIDR(ipAddresses []string) (string, error) {
 		return "", fmt.Errorf("no IP")
 	}
 
-	startIP := net.ParseIP(ipAddresses[0])
-	endIP := net.ParseIP(ipAddresses[0])
+	startIP, err := parseIPString(ipAddresses[0])
+	if err != nil {
+		return "", err
+	}
+	endIP, err := parseIPString(ipAddresses[0])
+	if err != nil {
+		return "", err
+	}
 
 	for _, ipStr := range ipAddresses[1:] {
-		ip := net.ParseIP(ipStr)
+		ip, err := parseIPString(ipStr)
+		if err != nil {
+			return "", err
+		}
 		if bytes.Compare(ip, startIP) < 0 {
 			startIP = ip
 		} else if bytes.Compare(ip, endIP) > 0 {
@@ -36,6 +45,14 @@ func leastCommonCIDR(ipAddresses []string) (string, error) {
 	}
 
 	return "", fmt.Errorf("no common CIDR found")
+}
+
+func parseIPString(ipStr string) (net.IP, error) {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return nil, fmt.Errorf("invalid IP address: %s", ipStr)
+	}
+	return ip, nil
 }
 
 func main() {
