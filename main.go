@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"os"
 )
 
 func leastCommonCIDR(ipAddresses []string) (string, error) {
 	if len(ipAddresses) == 0 {
-		return "", fmt.Errorf("IP 주소 목록이 비어 있습니다")
+		return "", fmt.Errorf("no IP")
 	}
 
-	// 첫 번째 IP 주소로 시작합니다.
 	startIP := net.ParseIP(ipAddresses[0])
 	endIP := net.ParseIP(ipAddresses[0])
 
@@ -24,7 +24,7 @@ func leastCommonCIDR(ipAddresses []string) (string, error) {
 		}
 	}
 
-	// 시작 IP와 종료 IP 사이의 네트워크 마스크를 찾습니다.
+	// find the mask from the start and end IP
 	for mask := 32; mask >= 0; mask-- {
 		maskedStart := net.CIDRMask(mask, 32)
 		startNet := startIP.Mask(maskedStart)
@@ -35,7 +35,7 @@ func leastCommonCIDR(ipAddresses []string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("적절한 CIDR을 계산할 수 없습니다")
+	return "", fmt.Errorf("no common CIDR found")
 }
 
 func main() {
@@ -48,8 +48,9 @@ func main() {
 
 	lcc, err := leastCommonCIDR(ipAddresses)
 	if err != nil {
-		fmt.Println("에러:", err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	} else {
-		fmt.Println("최소 공통 CIDR:", lcc)
+		fmt.Println("", lcc)
 	}
 }
