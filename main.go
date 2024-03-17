@@ -3,8 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net"
 	"os"
+
+	"github.com/urfave/cli/v2"
 )
 
 func leastCommonCIDR(ipAddresses []string) (string, error) {
@@ -56,18 +59,26 @@ func parseIPString(ipStr string) (net.IP, error) {
 }
 
 func main() {
-	ipAddresses := []string{
-		"192.168.1.1",
-		"192.168.1.2",
-		"192.168.1.4",
-		// "192.168.1.254",
+	app := &cli.App{
+		Name:      "lcc",
+		Usage:     "get the least common CIDR from a list of IP addresses",
+		ArgsUsage: "IP1 [IP2 ...]",
+		Action: func(cCtx *cli.Context) error {
+			ipAddresses := cCtx.Args().Slice()
+
+			lcc, err := leastCommonCIDR(ipAddresses)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			} else {
+				fmt.Println("", lcc)
+			}
+
+			return nil
+		},
 	}
 
-	lcc, err := leastCommonCIDR(ipAddresses)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	} else {
-		fmt.Println("", lcc)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }

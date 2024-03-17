@@ -9,7 +9,20 @@
 ## Usage
 
 ```sh
-$ lcc ipv4-1 [ip4-2 ...]
+$ lcc help
+
+NAME:
+   lcc - get the least common CIDR from a list of IP addresses
+
+USAGE:
+   lcc [global options] command [command options] IP1 [IP2 ...]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h  show help
+
 ```
 
 ## Install
