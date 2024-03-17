@@ -1,8 +1,13 @@
 
-name: Unit Tests
+name: integration
 
 on:
   push:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
 
 jobs:
   test:
@@ -21,5 +26,9 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Install dependencies
         run: go get .
+      - name: Lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.56
       - name: Test with Go
         run: go test -v
