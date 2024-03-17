@@ -10,6 +10,26 @@ permissions:
   checks: write
 
 jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required dependencies
+        run: |
+          apt update
+          apt install -y sudo
+          sudo apt install -y git curl
+          curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+          sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs
+
+      - name: Install commitlint
+        run: |
+          npm install conventional-changelog-conventionalcommits
+          npm install commitlint@latest
+      
+      - name: Validate current commit (last commit) with commitlint
+        run: commitlint --last --verbose
+  
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -20,15 +40,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
+
       - name: Install dependencies
         run: go get .
+
       - name: Lint
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.56
+          
       - name: Test with Go
         run: go test -v
