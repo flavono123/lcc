@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"reflect"
 	"testing"
 )
 
@@ -42,6 +44,38 @@ func TestLeastCommonCIDR(t *testing.T) {
 
 		if cidr != tc.expectedCIDR {
 			t.Errorf("Expected CIDR: %s, but got: %s", tc.expectedCIDR, cidr)
+		}
+
+		if fmt.Sprint(err) != fmt.Sprint(tc.expectedErr) {
+			t.Errorf("Expected error: %v, but got: %v", tc.expectedErr, err)
+		}
+	}
+}
+func TestParseIPString(t *testing.T) {
+	testCases := []struct {
+		ipStr       string
+		expectedIP  net.IP
+		expectedErr error
+	}{
+		// Test case 1: Valid IP address
+		{
+			ipStr:       "192.168.0.1",
+			expectedIP:  net.ParseIP("192.168.0.1"),
+			expectedErr: nil,
+		},
+		// Test case 2: Invalid IP address
+		{
+			ipStr:       "invalid-ip",
+			expectedIP:  nil,
+			expectedErr: fmt.Errorf("invalid IP address: invalid-ip"),
+		},
+	}
+
+	for _, tc := range testCases {
+		ip, err := parseIPString(tc.ipStr)
+
+		if !reflect.DeepEqual(ip, tc.expectedIP) {
+			t.Errorf("Expected IP: %v, but got: %v", tc.expectedIP, ip)
 		}
 
 		if fmt.Sprint(err) != fmt.Sprint(tc.expectedErr) {
