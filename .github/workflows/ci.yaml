@@ -2,7 +2,7 @@
 name: integration
 
 on:
-  push:
+  pull_request:
 
 permissions:
   contents: read
@@ -14,21 +14,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install required dependencies
-        run: |
-          apt update
-          apt install -y sudo
-          sudo apt install -y git curl
-          curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-          sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install commitlint
         run: |
-          npm install conventional-changelog-conventionalcommits
-          npm install commitlint@latest
+          npm install @commitlint/{config-conventional,cli}
       
-      - name: Validate current commit (last commit) with commitlint
-        run: commitlint --last --verbose
+      - name: Validate current commit
+        if: github.event_name == 'push'
+        run: npx commitlint --last --verbose
+
+      - name: Validate all commits from PR
+        if: github.event_name == 'pull_request'
+        run: npx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
   
   test:
     runs-on: ubuntu-latest
@@ -53,6 +57,6 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.56
-          
+
       - name: Test with Go
         run: go test -v
