@@ -60,8 +60,9 @@ func parseIPString(ipStr string) (net.IP, error) {
 
 func main() {
 	app := &cli.App{
-		Name:  "lcc",
-		Usage: "get the least common CIDR from a list of IP addresses",
+		Name:      "lcc",
+		Usage:     "get the least common CIDR from a list of IP addresses",
+		ArgsUsage: "IP1 [IP2 ...]",
 		Action: func(cCtx *cli.Context) error {
 			ipAddresses := cCtx.Args().Slice()
 
