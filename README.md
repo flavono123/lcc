@@ -27,5 +27,20 @@ GLOBAL OPTIONS:
 
 ## Install
 
+### macOS(Hombrew)
+
+WIP
+
+### Go
+  
+```sh
+$ git clone https://github.com/flavono123/lcc.git
+$ cd lcc
+$ go install
+```
+
 ## Algorithm
 
+## Contributing
+
+WIP
